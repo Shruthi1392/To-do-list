@@ -7,10 +7,20 @@
 </head>
 <body>
   <h1>My To-Do List</h1>
+  <form action="/tasks" method="post">
+    <input type="text" name="title" placeholder="Enter a new task">
+    <button type="Submit">Add task</button> 
+  </form>
   <ul>
     {% for task in tasks %}
       <li>
         {{ task.title }} {% if task.done %} ✅ {% endif %}
+        <form action="/tasks/{{task.id}}/done" method="post" style="display:inline;">
+          <button type="submit">Mark done</button>
+        </form>
+        <form action="/tasks/{{task.id}}/delete" method="post" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
       </li>
     {% endfor %}
   </ul>

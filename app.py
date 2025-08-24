@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,render_template
+from flask import Flask,jsonify,request,render_template,redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app=Flask(__name__)
@@ -24,36 +24,30 @@ def home():
     return render_template("index.html",tasks=tasks)
 
 
-@app.route("/tasks", methods=["GET"])
-def get_tasks():
-    tasks=tasks.query.all()
-    return jsonify([tasks.to_dict() for task in tasks])
-
 @app.route("/tasks", methods=["POST"])
 def add_tasks():
-    data=request.get_json()
-    task=Task(title=data["title"])
-    db.session.add(task)
-    db.session.commit()
-    return jsonify(task.to_dict()), 201
+    title=request.form.get("title")
+    if title:
+        new_task=Task(title=title)
+        db.session.add(new_task)
+        db.session.commit()
+    return redirect(url_for("home"))
 
-@app.route("/tasks/<int:task_id>", methods=["PUT"])
-def update_task(task_id):
+@app.route("/tasks/<int:task_id>/done", methods=["POST"])
+def mark_done(task_id):
     task=Task.query.get(task_id)
-    if not task:
-        return jsonify({"error":"Task not found"}),404
-    task.done=True
-    db.session.commit()
-    return jsonify(task.to_dict())
+    if task:
+        task.done=True
+        db.session.commit()
+    return redirect(url_for("home"))
     
-@app.route("/tasks/<int:task_id>", methods=["DELETE"])
+@app.route("/tasks/<int:task_id>/delete", methods=["POST"])
 def delete_task(task_id):
     task=Task.query.get(task_id)
-    if not task:
-        return jsonify({"error":"Task not found"}),404
-    db.session.delete(task)
-    db.session.commit()
-    return jsonify({"message":"Task deleted."})
+    if task:
+        db.session.delete(task)
+        db.session.commit()
+    return redirect(url_for("home"))
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True)
