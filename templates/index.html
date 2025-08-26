@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <title>To-Do List</title>
 </head>
 <body>
@@ -13,13 +14,13 @@
   </form>
   <ul>
     {% for task in tasks %}
-      <li>
-        {{ task.title }} {% if task.done %} ✅ {% endif %}
+      <li class="{%if task.done %}done{% endif %}">
+        {{ task.title }} 
         <form action="/tasks/{{task.id}}/done" method="post" style="display:inline;">
           <button type="submit">Mark done</button>
         </form>
         <form action="/tasks/{{task.id}}/delete" method="post" style="display:inline;">
-          <button type="submit">Delete</button>
+          <button type="submit" style="background-color: darkred;">Delete</button>
         </form>
       </li>
     {% endfor %}
